@@ -294,7 +294,7 @@ public interface HystrixCircuitBreaker {
         private boolean isAfterSleepWindow() {
             final long circuitOpenTime = circuitOpened.get();
             final long currentTime = System.currentTimeMillis();
-            // 获取配置的一个单位的时间窗口
+            // 获取配置的一个睡眠的时间窗口
             final long sleepWindowTime = properties.circuitBreakerSleepWindowInMilliseconds().get();
             return currentTime > circuitOpenTime + sleepWindowTime;
         }
