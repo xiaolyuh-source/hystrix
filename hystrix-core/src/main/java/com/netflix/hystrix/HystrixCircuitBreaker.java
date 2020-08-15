@@ -39,7 +39,8 @@ public interface HystrixCircuitBreaker {
      * not modify any internal state, and takes into account the half-open logic which allows some requests through
      * after the circuit has been opened
      * <p>
-     * 每个HystrixCommand请求都会询问是否允许继续。它是幂等的，不会修改任何内部状态，并考虑到半开逻辑，它允许在电路打开后通过一些请求
+     * 每个HystrixCommand请求都会询问是否允许继续（当断路器开关为OPEN和HALF_OPEN都时返回false，当断路器开关是CLOSE时或者到了下一个睡眠窗口时返回true）。
+     * 它是幂等的，不会修改任何内部状态，并考虑到半开逻辑，当一个睡眠窗口到来时他会放行一些请求到后续逻辑
      *
      * @return boolean whether a request should be permitted (是否应允许请求)
      */
@@ -47,7 +48,7 @@ public interface HystrixCircuitBreaker {
 
     /**
      * Whether the circuit is currently open (tripped).
-     * 熔断开关是否打开（跳闸）。
+     * 熔断开关是否打开（如果是OPEN或HALF_OPEN时都返回true，如果为CLOSE时返回false，无副作用，是幂等方式）。
      *
      * @return boolean state of circuit breaker（返回断路器的状态）
      */
@@ -69,8 +70,8 @@ public interface HystrixCircuitBreaker {
     /**
      * Invoked at start of command execution to attempt an execution.  This is non-idempotent - it may modify internal
      * state.
-     *
-     * 在命令执行开始时调用以尝试执行。这是非幂等的 - 它可能会修改内部状态。
+     * <p>
+     * 在命令执行开始时调用以尝试执行，主要所用时判断该请求是否可以执行。这是非幂等的 - 它可能会修改内部状态。
      */
     boolean attemptExecution();
 
